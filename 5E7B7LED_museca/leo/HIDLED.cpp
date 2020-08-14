@@ -12,6 +12,7 @@
 
 SinglePin extern SinglePins[];
 RGBPin extern RGBPins[];
+unsigned long extern ReactiveTimeoutCount;
 
 void led_stuff(SinglePin pins, byte brightness)
 {
@@ -39,6 +40,7 @@ void light_update(SingleLED* single_leds, RGBLed* rgb_leds) {
       rgb_stuff(RGBPins[i], rgb_leds[i].r, rgb_leds[i].g, rgb_leds[i].b);
     }
   }
+  ReactiveTimeoutCount = 0;
 }
 
 static const byte PROGMEM _hidReportLEDs[] = {

@@ -18,6 +18,8 @@ const int PULSE = 600;  //number of pulses per revolution of encoders (600) or g
 byte EncPins[]    = {0, 4, 1, 5, 2, 6, 3, 8, 7, 9};
 byte SinglePins[] = {10,12,18,20,22,14,16};
 byte ButtonPins[] = {11,13,19,21,23,15,17};
+unsigned long ReactiveTimeoutMax = 1000;  //number of cycles before HID falls back to reactive
+
 /* pin assignments
  * Encoder 0 Green to pin 0 and White to pin 4
  * Encoder 1 Green to pin 1 and White to pin 5
@@ -31,8 +33,8 @@ byte ButtonPins[] = {11,13,19,21,23,15,17};
  *  ButtonPins {11,13,19,21,23,15,17} = Button input 1 to 7
  *    connect button pin to ground to trigger button press
  *  Light mode detection by read first button while connecting usb 
- *   hold    = false = HID lighting
- *   release = true  = reactive lighting 
+ *   hold    = false = reactive lighting
+ *   release = true  = HID lighting with reactive fallback
  */
 const byte ButtonCount = sizeof(ButtonPins) / sizeof(ButtonPins[0]);
 const byte SingleCount = sizeof(SinglePins) / sizeof(SinglePins[0]);
@@ -41,6 +43,7 @@ const byte EncCount = EncPinCount / 2;
 int enc[EncCount]={0};
 boolean state[EncCount]={false}, set[EncPinCount]={false};
 unsigned long LEDmillis[EncCount]={0};
+unsigned long ReactiveTimeoutCount = ReactiveTimeoutMax;
 
 int ReportDelay = 700;
 unsigned long ReportRate;
@@ -120,7 +123,7 @@ void loop() {
   }
 
   //reactive lighting
-  if(hidMode==false){
+  if(hidMode==false || (hidMode==true && ReactiveTimeoutCount>=ReactiveTimeoutMax)){
     for(int i=0;i<EncCount;i++) {  //trigger for spinner light
       if(digitalRead(ButtonPins[i])==LOW) {
         LEDmillis[i] = millis();
@@ -136,7 +139,9 @@ void loop() {
       digitalWrite(SinglePins[i],LOW);
       }
     }
-
+  }
+  else if(hidMode==true) {
+    ReactiveTimeoutCount++;
   }
 
   //read encoders, detect overflow and rollover
