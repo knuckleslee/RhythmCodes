@@ -15,6 +15,7 @@ Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID,JOYSTICK_TYPE_GAMEPAD, 12, 0,
 boolean hidMode;
 byte SinglePins[] = {0,2,4,6,8,10,12,18,20,22,14,16};
 byte ButtonPins[] = {1,3,5,7,9,11,13,19,21,23,15,17};
+unsigned long ReactiveTimeoutMax = 1000;  //number of cycles before HID falls back to reactive
 
 /* pin assignments
  * current pin layout
@@ -25,11 +26,12 @@ byte ButtonPins[] = {1,3,5,7,9,11,13,19,21,23,15,17};
  *    connect button pin to ground to trigger button press
  *  Light mode detection by read first button while connecting usb 
  *   hold    = false = reactive lighting 
- *   release = true  = HID lighting
+ *   release = true  = HID lighting with reactive fallback
  */
 
 byte ButtonCount = sizeof(ButtonPins) / sizeof(ButtonPins[0]);
 byte SingleCount = sizeof(SinglePins) / sizeof(SinglePins[0]);
+unsigned long ReactiveTimeoutCount = ReactiveTimeoutMax;
 
 int ReportDelay = 700;
 unsigned long ReportRate;
@@ -95,14 +97,13 @@ void loop() {
     }
   }
 
-  if(hidMode==false){
+  if(hidMode==false || (hidMode==true && ReactiveTimeoutCount>=ReactiveTimeoutMax)){
     for(int i=0;i<ButtonCount;i++) {
-      if(digitalRead(ButtonPins[i])==LOW) {
-      digitalWrite(SinglePins[i],HIGH);
-      } else {
-      digitalWrite(SinglePins[i],LOW);
-      }
+      digitalWrite (SinglePins[i],!(digitalRead(ButtonPins[i])));
     }
+  }
+  else if(hidMode==true) {
+    ReactiveTimeoutCount++;
   }
 
   //report

@@ -18,6 +18,7 @@ const int PULSE = 600;  //number of pulses per revolution of encoders
 byte EncPins[]    = {0, 1, 2, 3};
 byte SinglePins[] = {4, 6, 8, 10,12,18,20,22,14,16};
 byte ButtonPins[] = {5, 7, 9, 11,13,19,21,23,15,17};
+unsigned long ReactiveTimeoutMax = 1000;  //number of cycles before HID falls back to reactive
 
 /* pin assignments
  * VOL-L Green to pin 0 and White to pin 1
@@ -30,12 +31,13 @@ byte ButtonPins[] = {5, 7, 9, 11,13,19,21,23,15,17};
  *    connect button pin to ground to trigger button press
  *  Light mode detection by read first button while connecting usb 
  *   hold    = false = reactive lighting 
- *   release = true  = HID lighting
+ *   release = true  = HID lighting with reactive fallback
  */
  
 byte ButtonCount = sizeof(ButtonPins) / sizeof(ButtonPins[0]);
 byte SingleCount = sizeof(SinglePins) / sizeof(SinglePins[0]);
 byte EncPinCount = sizeof(EncPins) / sizeof(EncPins[0]);
+unsigned long ReactiveTimeoutCount = ReactiveTimeoutMax;
 
 int ReportDelay = 700;
 unsigned long ReportRate ;
@@ -107,10 +109,13 @@ void loop() {
     Joystick.setButton (i,!(digitalRead(ButtonPins[i])));
   }
 
-  if(hidMode==false){
+  if(hidMode==false || (hidMode==true && ReactiveTimeoutCount>=ReactiveTimeoutMax)){
     for(int i=0;i<ButtonCount;i++) {
       digitalWrite (SinglePins[i],!(digitalRead(ButtonPins[i])));
     }
+  }
+  else if(hidMode==true) {
+    ReactiveTimeoutCount++;
   }
 
   //read encoders, detect overflow and rollover
