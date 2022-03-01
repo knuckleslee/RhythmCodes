@@ -51,15 +51,15 @@ void loop() {
   }
   if(KeyStatus[0] != KeyStatus[0+ButtonCount]) {
     if(KeyStatus[0] == LOW )
-      { SwitchControlLibrary().PressButtonL();  }
+      { SwitchControlLibrary().pressButton(Button::L);  }
     else
-      { SwitchControlLibrary().ReleaseButtonL();  }
+      { SwitchControlLibrary().releaseButton(Button::L);  }
   }
   if(KeyStatus[1] != KeyStatus[1+ButtonCount]) {
     if(KeyStatus[1] == LOW )
-      { SwitchControlLibrary().PressButtonR();  }
+      { SwitchControlLibrary().pressButton(Button::R);  }
     else
-      { SwitchControlLibrary().ReleaseButtonR();  }
+      { SwitchControlLibrary().releaseButton(Button::R);  }
   }
 
 //initialize Virtual ButtonPlus
@@ -74,9 +74,9 @@ void loop() {
 
   if(KeyStatus[2] != KeyStatus[2+ButtonCount]) {
     if(KeyStatus[2] == LOW )
-      { SwitchControlLibrary().PressButtonPlus();  }
+      { SwitchControlLibrary().pressButton(Button::PLUS);  }
     else
-      { SwitchControlLibrary().ReleaseButtonPlus();  }
+      { SwitchControlLibrary().releaseButton(Button::PLUS);  }
   }
   
 //initialize LeftStick
@@ -108,34 +108,34 @@ void loop() {
       {LeftStickX = LeftStickX-DigitalStick;  }
   }
 
-  SwitchControlLibrary().MoveLeftStick(LeftStickX, LeftStickY);
+  SwitchControlLibrary().moveLeftStick(LeftStickX, LeftStickY);
 
 //
   if(KeyStatus[7] != KeyStatus[7+ButtonCount]) {
     if(KeyStatus[7] == LOW )
-      { SwitchControlLibrary().PressButtonX();  }
+      { SwitchControlLibrary().pressButton(Button::X);  }
     else
-      { SwitchControlLibrary().ReleaseButtonX();  }
+      { SwitchControlLibrary().releaseButton(Button::X);  }
   }
   if(KeyStatus[8] != KeyStatus[8+ButtonCount]) {
     if(KeyStatus[8] == LOW )
-      { SwitchControlLibrary().PressButtonB();  }
+      { SwitchControlLibrary().pressButton(Button::B);  }
     else
-      { SwitchControlLibrary().ReleaseButtonB();  }
+      { SwitchControlLibrary().releaseButton(Button::B);  }
   }
   if(KeyStatus[9] != KeyStatus[9+ButtonCount]) {
     if(KeyStatus[9] == LOW )
-      { SwitchControlLibrary().PressButtonY();  }
+      { SwitchControlLibrary().pressButton(Button::Y);  }
     else
-      { SwitchControlLibrary().ReleaseButtonY();  }
+      { SwitchControlLibrary().releaseButton(Button::Y);  }
   }
   if(KeyStatus[10] != KeyStatus[10+ButtonCount]) {
     if(KeyStatus[10] == LOW )
-      { SwitchControlLibrary().PressButtonA();  }
+      { SwitchControlLibrary().pressButton(Button::A);  }
     else
-      { SwitchControlLibrary().ReleaseButtonA();  }
+      { SwitchControlLibrary().releaseButton(Button::A);  }
   }
-
+  SwitchControlLibrary().sendReport();
   for (int i = 0; i < ButtonCount; i++) {
     KeyStatus[i+ButtonCount] = KeyStatus[i];  //save status
   }
